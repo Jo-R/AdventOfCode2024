@@ -13,44 +13,22 @@ namespace AdventOfCode2024.Days
         {
             foreach (var item in input)
             {
-                var row = item.Split(" ");
+                var row = item.Split(" ", StringSplitOptions.RemoveEmptyEntries);
                 group1.Add(Int32.Parse(row[0]));
-                group2.Add(Int32.Parse(row[3]));
+                group2.Add(Int32.Parse(row[1]));
             }
             group1.Sort();
             group2.Sort();
-            var bothSets = group1.Zip(group2, (x, y) => new { First = x, Second = y });
-            int result = 0;
-            foreach (var comp in bothSets)
-            {
-                var sub = Math.Abs(comp.First - comp.Second);
-                result += sub;
-            }
-
+            var result = group1.Zip(group2, (x, y) => new { First = x, Second = y })
+                .Select(p => Math.Abs(p.First - p.Second))
+                .Sum(); 
            Console.WriteLine(result);
         }
 
         public override void RunProblemTwo()
         {
-            var list2Counts = new Dictionary<int, int>();
-            foreach (var item in group2) {
-                if (list2Counts.ContainsKey(item))
-                {
-                    list2Counts[item]++;
-                }
-                else
-                {
-                    list2Counts[item] = 1;
-                }
-            }
-
-            var result = 0;
-            foreach (var item in group1) {
-                if (list2Counts.ContainsKey(item)) {
-                    var score = item * list2Counts[item];
-                    result += score;
-                }
-            }
+            var groupedB = group2.GroupBy(x => x).ToDictionary(x => x.Key, x => x.Count());
+            var result = group1.Select(x => groupedB.GetValueOrDefault(x, 0) * x).Sum();
             Console.WriteLine(result);
         }
     }
