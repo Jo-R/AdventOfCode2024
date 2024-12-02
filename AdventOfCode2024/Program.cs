@@ -2,4 +2,4 @@
 
 var day = new DayTwo();
 day.RunProblemOne();
-//day.RunProblemTwo();
+day.RunProblemTwo();
