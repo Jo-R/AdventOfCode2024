@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,34 +11,34 @@ namespace AdventOfCode2024.Days
     public class DayThree : AdventBase
     {
         // https://adventofcode.com/2024/day/3
-        public string[] input = GetInput("Inputs/dayThree.txt");
+        public static string[] input = GetInput("Inputs/dayThree.txt");
+        string joinedInput = string.Join(",", input);
+        Regex mulPattern = new Regex("mul\\(([0-9]{1,3}),([0-9]{1,3})\\)");
 
         public override void RunProblemOne()
-        {
-            string pattern = @"mul\([0-9]+,[0-9]+\)";
-            var allMatches = new List<Match>();
-            foreach (string inputItem in input) {
-                var matches = Regex.Matches(inputItem, pattern, RegexOptions.None);
-                foreach (Match match in matches) {
-                    allMatches.Add(match);
-                 }
-            }
-            
+        {         
             var result = 0;
-            string numsOnly = @"[0-9]+,[0-9]+";
-            foreach (Match match in allMatches) 
+            foreach (Match match in mulPattern.Matches(joinedInput)) 
             {
-                var matchNums = Regex.Match(match.Value, numsOnly).Value.Split(",");
-                Console.WriteLine($"{matchNums[0]} {matchNums[1]}");
-                result += int.Parse(matchNums[0]) * int.Parse(matchNums[1]);
-                
+                result += (int.Parse(match.Groups[1].Value) * int.Parse(match.Groups[2].Value));
+
             }
-            Console.WriteLine(result);  // 29369763 is too low
+            Console.WriteLine(result);
         }
 
         public override void RunProblemTwo()
         {
-            throw new NotImplementedException();
+            Regex doPattern = new Regex("(?:^|do\\(\\))(.*?)(?=(?:don't\\(\\))|$)", RegexOptions.Singleline);
+            var result = 0;
+            foreach (Match doMatch in doPattern.Matches(joinedInput))
+            {
+                foreach (Match mulMatch in mulPattern.Matches(doMatch.Groups[1].Value))
+                {
+                    result += (int.Parse(mulMatch.Groups[1].Value) * int.Parse(mulMatch.Groups[2].Value));
+
+                }
+            }
+            Console.WriteLine(result);   
         }
     }
 }
